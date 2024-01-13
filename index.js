@@ -6,7 +6,7 @@ const cors = require('cors')
 const app = express()
 const Person = require('./models/person')
 
-morgan.token('data', function(req, res) {
+morgan.token('data', function (req, res) {
     return JSON.stringify(req.body)
 })
 
@@ -23,33 +23,35 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :d
     skip: (req, res) => req.method !== "POST"
 }))
 
-let persons = [
-    {
-        id: 1,
-        name: "Arto Hellas",
-        number: "040-123456"
-    },
-    {
-        id: 2,
-        name: "Ada Lovelace",
-        number: "39-44-5323523"
-    },
-    {
-        id: 3,
-        name: "Dan Abramov",
-        number: "12-43-234345"
-    },
-    {
-        id: 4,
-        name: "Mary Poppendieck",
-        number: "39-23-6423122"
-    }
-]
+// let persons = [
+//     {
+//         id: 1,
+//         name: "Arto Hellas",
+//         number: "040-123456"
+//     },
+//     {
+//         id: 2,
+//         name: "Ada Lovelace",
+//         number: "39-44-5323523"
+//     },
+//     {
+//         id: 3,
+//         name: "Dan Abramov",
+//         number: "12-43-234345"
+//     },
+//     {
+//         id: 4,
+//         name: "Mary Poppendieck",
+//         number: "39-23-6423122"
+//     }
+// ]
 
 app.get('/info', (request, response) => {
-    const returnedHtml = `<p>Phonebook has info for ${persons.length} ${persons.length > 1 ? 'people' : 'person'} <br/> ${new Date()}</p>`
-    
-    response.send(returnedHtml)
+    Person.find({}).then(persons => {
+        const returnedHtml = `<p>Phonebook has info for ${persons.length} ${persons.length > 1 ? 'people' : 'person'} <br/> ${new Date()}</p>`
+
+        response.send(returnedHtml)
+    })
 })
 
 app.get('/api/persons', (request, response) => {
@@ -83,7 +85,7 @@ app.post('/api/persons', (request, response) => {
 
     const personCheck = persons.find(p => p.name.toLowerCase() === body.name.toLowerCase())
 
-    if(personCheck) {
+    if (personCheck) {
         return response.status(400).json({
             error: 'name must be unique'
         })
